@@ -1,0 +1,69 @@
+#define LEVELS 10
+
+const int LED_pins[] = {2, 3, 4, 5, 10, 11};
+const int button_pins[] = {6, 7, 8, 9};
+
+int sequence[LEVELS];
+int sequenceLength = 1;
+
+void setup() {
+  for (int i = 0; i < 6; i++) {
+    pinMode(LED_pins[i], OUTPUT);
+  }
+  for (int i = 0; i < 4; i++) {
+    pinMode(button_pins[i], INPUT_PULLUP);
+  }
+  startGame();
+}
+
+void loop() {
+  for (int i = 0; i < 4; i++) {
+    if (digitalRead(button_pins[i]) == LOW) {
+      if (i == sequence[sequenceLength - 1]) {
+        delay(300);
+        if (sequenceLength < LEVELS) {
+          sequenceLength++;
+          playSequence();
+        } else {
+          winGame();
+        }
+      } else {
+        loseGame();
+      }
+    }
+  }
+}
+
+void startGame() {
+  randomSeed(analogRead(0));
+  for (int i = 0; i < LEVELS; i++) {
+    sequence[i] = random(4);
+  }
+  sequenceLength = 1;
+  playSequence();
+}
+
+void playSequence() {
+  for (int i = 0; i < sequenceLength; i++) {
+    digitalWrite(LED_pins[sequence[i]], HIGH);
+    delay(500);
+    digitalWrite(LED_pins[sequence[i]], LOW);
+    delay(200);
+  }
+}
+
+void winGame() {
+  digitalWrite(LED_pins[4], HIGH);
+  delay(1000);
+  digitalWrite(LED_pins[4], LOW);
+  delay(500);
+  startGame();
+}
+
+void loseGame() {
+  digitalWrite(LED_pins[5], HIGH);
+  delay(1000);
+  digitalWrite(LED_pins[5], LOW);
+  delay(500);
+  startGame();
+}
